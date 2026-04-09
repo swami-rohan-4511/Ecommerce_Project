@@ -1,0 +1,20 @@
+/**
+ * Custom Error Handler Class
+ * Extends Error to provide better error handling and logging
+ */
+
+class ApiError extends Error {
+  constructor(statusCode, message, errors = null, stack = '') {
+    super(message);
+    this.statusCode = statusCode;
+    this.errors = errors;
+
+    if (stack) {
+      this.stack = stack;
+    } else {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+}
+
+module.exports = ApiError;
