@@ -1,5 +1,5 @@
 -- =====================================================
--- E-COMMERCE DATABASE SCHEMA
+-- E-COMMERCE DATABASE SCHEMA - UPDATED FOR AUTHENTICATION
 -- =====================================================
 
 -- Create Database
@@ -7,7 +7,7 @@ CREATE DATABASE IF NOT EXISTS ecommerce_db;
 USE ecommerce_db;
 
 -- =====================================================
--- 1. ROLES TABLE
+-- 1. ROLES TABLE - UPDATED WITH AUTH ROLES
 -- =====================================================
 CREATE TABLE IF NOT EXISTS roles (
   role_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS roles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================
--- 2. USERS TABLE
+-- 2. USERS TABLE - UPDATED FOR AUTHENTICATION
 -- =====================================================
 CREATE TABLE IF NOT EXISTS users (
   user_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -35,13 +35,15 @@ CREATE TABLE IF NOT EXISTS users (
   postal_code VARCHAR(20),
   country VARCHAR(100),
   is_active BOOLEAN DEFAULT TRUE,
+  is_verified BOOLEAN DEFAULT FALSE,
   last_login TIMESTAMP NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE RESTRICT,
   INDEX idx_email (email),
   INDEX idx_user_role (role_id),
-  INDEX idx_is_active (is_active)
+  INDEX idx_is_active (is_active),
+  INDEX idx_is_verified (is_verified)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================
@@ -124,21 +126,21 @@ CREATE INDEX idx_orders_user_created ON orders(user_id, created_at);
 CREATE INDEX idx_order_items_order_product ON order_items(order_id, product_id);
 
 -- =====================================================
--- INITIAL DATA INSERTION
+-- INITIAL DATA INSERTION - UPDATED FOR AUTHENTICATION
 -- =====================================================
 
 -- Insert Roles
-INSERT INTO roles (role_name, description) VALUES 
-('admin', 'Administrator with full access'),
-('vendor', 'Vendor/Seller with product management access'),
-('customer', 'Regular customer');
+INSERT INTO roles (role_name, description) VALUES
+('SUPER_ADMIN', 'Super administrator with full system access'),
+('ADMIN', 'Administrator with elevated access'),
+('CUSTOMER', 'Regular customer with basic access');
 
 -- Insert Sample Users
-INSERT INTO users (role_id, first_name, last_name, email, password_hash, phone_number, address, city, state, postal_code, country) VALUES 
-(1, 'Admin', 'User', 'admin@ecommerce.com', '$2a$10$Dn2qkQvIUhcHZlNNiZwPi.mR7vqBcZqoXnKTvwV5HV8pKJVn0dJJm', '9999999999', '123 Admin St', 'New York', 'NY', '10001', 'USA'),
-(2, 'John', 'Vendor', 'vendor@ecommerce.com', '$2a$10$Dn2qkQvIUhcHZlNNiZwPi.mR7vqBcZqoXnKTvwV5HV8pKJVn0dJJm', '9999999998', '456 Vendor Ave', 'Los Angeles', 'CA', '90001', 'USA'),
-(3, 'Alice', 'Customer', 'alice@customer.com', '$2a$10$Dn2qkQvIUhcHZlNNiZwPi.mR7vqBcZqoXnKTvwV5HV8pKJVn0dJJm', '9999999997', '789 Customer Ln', 'Chicago', 'IL', '60601', 'USA'),
-(3, 'Bob', 'Customer', 'bob@customer.com', '$2a$10$Dn2qkQvIUhcHZlNNiZwPi.mR7vqBcZqoXnKTvwV5HV8pKJVn0dJJm', '9999999996', '321 Buyer Rd', 'Houston', 'TX', '77001', 'USA');
+INSERT INTO users (role_id, first_name, last_name, email, password_hash, phone_number, address, city, state, postal_code, country, is_verified) VALUES
+(1, 'Super', 'Admin', 'superadmin@ecommerce.com', '$2a$10$Dn2qkQvIUhcHZlNNiZwPi.mR7vqBcZqoXnKTvwV5HV8pKJVn0dJJm', '9999999999', '123 Admin St', 'New York', 'NY', '10001', 'USA', TRUE),
+(2, 'Admin', 'User', 'admin@ecommerce.com', '$2a$10$Dn2qkQvIUhcHZlNNiZwPi.mR7vqBcZqoXnKTvwV5HV8pKJVn0dJJm', '9999999998', '456 Admin Ave', 'Los Angeles', 'CA', '90001', 'USA', TRUE),
+(3, 'Alice', 'Customer', 'alice@customer.com', '$2a$10$Dn2qkQvIUhcHZlNNiZwPi.mR7vqBcZqoXnKTvwV5HV8pKJVn0dJJm', '9999999997', '789 Customer Ln', 'Chicago', 'IL', '60601', 'USA', TRUE),
+(3, 'Bob', 'Customer', 'bob@customer.com', '$2a$10$Dn2qkQvIUhcHZlNNiZwPi.mR7vqBcZqoXnKTvwV5HV8pKJVn0dJJm', '9999999996', '321 Buyer Rd', 'Houston', 'TX', '77001', 'USA', FALSE);
 
 -- Insert Sample Products
 INSERT INTO products (product_name, description, price, discount_price, stock_quantity, category, brand, sku, created_by) VALUES 

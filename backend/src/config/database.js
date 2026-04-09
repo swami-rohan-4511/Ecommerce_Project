@@ -41,6 +41,20 @@ const executeQuery = async (query, values = []) => {
   }
 };
 
+const executeQueryRaw = async (query, values = []) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const [results] = await connection.query(query, values);
+    return results;
+  } catch (error) {
+    console.error('Query Execution Error:', error.message);
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
+
 // Test Database Connection
 const testConnection = async () => {
   try {
@@ -54,9 +68,10 @@ const testConnection = async () => {
   }
 };
 
-module.exports = {
-  pool,
-  getConnection,
-  executeQuery,
-  testConnection,
-};
+// module.exports = {
+//   pool,
+//   getConnection,
+//   executeQuery,
+//   testConnection,
+// };
+module.exports = { pool, getConnection, executeQuery, executeQueryRaw, testConnection };

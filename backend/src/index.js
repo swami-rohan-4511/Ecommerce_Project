@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const { testConnection } = require('./config/database');
 const healthCheckRouter = require('./routes/healthCheck');
+const authRouter = require('./routes/authRoutes');
 
 // Initialize Express App
 const app = express();
@@ -41,6 +42,9 @@ const apiPrefix = process.env.API_PREFIX || '/api/v1';
 
 // Health Check Route
 app.use(`${apiPrefix}/health`, healthCheckRouter);
+
+// Authentication Routes
+app.use(`${apiPrefix}/auth`, authRouter);
 
 // Root Route
 app.get('/', (req, res) => {
@@ -107,6 +111,11 @@ const startServer = async () => {
       console.log('');
       console.log('Available endpoints:');
       console.log(`  - GET  ${apiPrefix}/health`);
+      console.log(`  - POST ${apiPrefix}/auth/register`);
+      console.log(`  - POST ${apiPrefix}/auth/login`);
+      console.log(`  - GET  ${apiPrefix}/auth/profile (protected)`);
+      console.log(`  - PUT  ${apiPrefix}/auth/profile (protected)`);
+      console.log(`  - GET  ${apiPrefix}/auth/users (admin only)`);
       console.log('');
     });
   } catch (error) {
